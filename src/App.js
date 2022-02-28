@@ -1,11 +1,14 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { useState, useEffect, Fragment } from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 
 function App() {
   const [error, setError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState({});
+  const [tabIndex, setTabIndex] = useState(0);
   //const [filter, setFilter] = useState({filterType: "type", value:"education"});
   const [filter, setFilter] = useState({
     filterType: "participants",
@@ -34,10 +37,26 @@ function App() {
   //     )
   // }, [])
 
+  useEffect(() => {
+    if (tabIndex == 0) {
+      console.log("Filter type = None");     
+    } else if (tabIndex == 1) {
+      console.log("Filter type = Activity type")
+    } else if (tabIndex == 2) {
+      console.log("Filter type = Participants")
+    } else if (tabIndex == 3) {
+      console.log("Filter type = Participants")
+    }
+
+  }, [tabIndex])
+
+
   const newActivity = () => {
-    fetch(
-      `http://www.boredapi.com/api/activity?${filter.filterType}=${filter.value}`
-    )
+    let url = "http://www.boredapi.com/api/activity/"
+    if (tabIndex !== 0){
+      url = `http://www.boredapi.com/api/activity?${filter.filterType}=${filter.value}`
+    }
+    fetch(url)
       .then((res) => res.json())
       .then(
         (result) => {
@@ -60,9 +79,35 @@ function App() {
   } else {
     return (
       <Fragment>
-        <div className="bg-hero-mobile md:bg-hero-desktop bg-cover bg-bottom bg-no-repeat text-center py-40">
+        <div className="bg-hero-mobile md:bg-hero-desktop bg-cover bg-bottom bg-no-repeat text-center pt-40">
           <h1 className="text-3xl font-bold underline">Buster</h1>
-          <button onClick={newActivity} className="border border-black border-1">Generate new activity</button>
+          <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
+          <TabList className="">
+            <Tab selectedClassName="">None</Tab>
+            <Tab selectedClassName="">Activity type</Tab>
+            <Tab selectedClassName="">Participants</Tab>
+            <Tab selectedClassName="">Price</Tab>
+          </TabList>
+
+          <TabPanel>
+            <h2>No filters set</h2>
+          </TabPanel>
+          <TabPanel>
+            <h2>Activity types</h2>
+          </TabPanel>
+          <TabPanel>
+            <h2>No. participants</h2>
+          </TabPanel>
+          <TabPanel>
+            <h2>Price ranges</h2>
+          </TabPanel>
+        </Tabs>
+          <button
+            onClick={newActivity}
+            className="border border-black border-1"
+          >
+            Generate new activity
+          </button>
         </div>
         <div className="text-center">
           {!isLoaded && <p></p>}
